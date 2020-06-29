@@ -1,0 +1,31 @@
+version: "2"
+services: 
+    python-app:
+        image: rk90229/speedtest-docker_python-app
+        container_name: python-app
+        links:
+            - db
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+    app:
+        image: rk90229/speedtest-docker_app
+        container_name: flask-app
+        links:
+            - db
+        ports:
+            - "5000:5000"
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+    db:
+        image: mariadb:10.3
+        container_name: mariadb
+        ports: 
+            - "32000:3306"
+        environment: 
+            MYSQL_DATABASE: "speedtest"
+            MYSQL_USER: "speedtestuser"
+            MYSQL_PASSWORD: "wifi123!"
+            MYSQL_ROOT_PASSWORD: "wifi123!"
+        volumes:
+            - ./db:/docker-entrypoint-initdb.d/:ro 
+            - /etc/localtime:/etc/localtime:ro

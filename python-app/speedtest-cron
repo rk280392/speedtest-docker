@@ -1,0 +1,2 @@
+# RUN SPEEDTEST every 2 minutes
+*/10 * * * * root /usr/bin/python3 /app/speedtest-python.py &>> log

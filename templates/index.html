@@ -1,0 +1,171 @@
+
+{% include "header.html" %}
+<link href="{{url_for('static', filename = 'css/bootstrap.min.css')}}" rel="stylesheet">
+{% block body %}
+<script ctype="text/javascript" src="{{url_for('static', filename = 'js/canvasjs.min.js')}}"></script>
+<script ctype="text/javascript" src="{{url_for('static', filename = 'js/exportToCSV.js')}}"></script>
+
+	<!DOCTYPE HTML>
+<head>
+<script type="text/javascript">
+window.onload = function () {
+
+var dataPoints1 = [];
+var dataPoints2 = [];
+
+var chart = new CanvasJS.Chart("chartContainer", {
+	zoomEnabled: true,
+	title: {
+		text: "Download and Upload speeds"
+	},
+	axisX: {
+		title: "chart updates every 10 minutes"
+	},
+	axisY:{
+		prefix: "Mbps ",
+		includeZero: true
+	},
+	toolTip: {
+		shared: true
+	},
+	legend: {
+		cursor:"pointer",
+		verticalAlign: "top",
+		fontSize: 22,
+		fontColor: "dimGrey",
+		itemclick : toggleDataSeries
+	},
+	data: [{
+		type: "line",
+		xValueType: "dateTime",
+		yValueFormatString: "####Mbps",
+		xValueFormatString: "hh:mm:ss TT",
+		showInLegend: true,
+		name: "Download",
+		dataPoints: dataPoints1
+		},
+		{
+			type: "line",
+			xValueType: "dateTime",
+			yValueFormatString: "####Mbps",
+			showInLegend: true,
+			name: "Upload" ,
+			dataPoints: dataPoints2
+	}]
+});
+
+function toggleDataSeries(e) {
+	if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+		e.dataSeries.visible = false;
+	}
+	else {
+		e.dataSeries.visible = true;
+	}
+	chart.render();
+
+}
+
+var updateInterval = 360000;
+// initial value
+var yValue1 = 0;
+var yValue2 = 0;
+var xValue = new Date;
+
+function updateChart() {
+	{% for row in speedtests %} 
+		xValue = Date.parse("{{ row[1] }}");
+		yValue1 = {{ row[5] }};
+		yValue2 = {{ row[4] }};
+
+	// pushing the new values
+	dataPoints1.push({
+		x: xValue,
+		y: yValue1
+	});
+
+	dataPoints2.push({
+		x: xValue,
+		y: yValue2
+	});	
+                {% endfor  %}
+
+	// updating legend text with  updated with y Value
+
+	chart.options.data[0].legendText = " Download " + yValue1 + " Mbps";
+	chart.options.data[1].legendText = " Upload " + yValue2 + " Mbps";
+	chart.render();
+
+	document.getElementById("exportChart").addEventListener("click",function(){
+        chart.exportChart({format: ".png"});
+    });
+}
+// generates first set of dataPoints
+updateChart();
+setInterval(function(){updateChart()}, updateInterval);
+
+}
+</script>
+</head>
+<body>
+<div class="row">
+    <p>
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#tableContainer"
+            aria-expanded="false" aria-controls="collapseExample" style="margin-left: 10px;">
+            Speedtest Report
+        </button>
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#chartContainer"
+            aria-expanded="false" aria-controls="collapseExample" style="margin-left: 10px;">
+            Speedtest Graph
+        </button>
+	<button class="btn btn-primary" type="button" onclick="exportTableToCSV('ISPSpeedReport.csv')">Export ISP Report To CSV File</button>
+	<button class="btn btn-primary" type="button" id="exportChart">Export Chart</button>
+
+    </p>
+</div>
+<div class="row card card-body collapse" id="tableContainer">
+    <div class="col-sm-12">
+        <table class="table table-striped">
+
+            <tr>
+                <th>Id</th>
+                <th>Timestamp</th>
+                <th>Public IP</th>
+                <th>Peer Server</th>
+                <th>Download Speed(Mbps)</th>
+                <th>Upload Speed(Mbps)</th>
+            </tr>
+
+            {% for row in speedtests %}
+            <tr>
+                <td>{{row.0}}</td>
+                <td>{{row.1}}</td>
+                <td>{{row.2}}</td>
+                <td>{{row.3}}</td>
+                <td>{{row.5}}</td>
+                <td>{{row.4}}</td>
+            </tr>
+
+            <div id="modaledit{{row.0}}" class="modal fade" role="dialog"></div>
+            {% endfor  %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row card card-body collapse" id="chartContainer">
+    <div class="col-sm-12">
+        <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+    </div>
+</div>
+<!--div class="row card card-body">
+    <div class="col-sm-12">
+     <div class="well">
+	     <a href="https://learningdevops.com">Learn More</a>
+	     <span class="pull-right"><a href="https://github.com/rk280392/speedtest-programs.git"> Source Code</a></span>
+    </div>
+    </div-->
+</body>
+<!-- Modal -->
+{% endblock %}
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
+<script type="text/javascript" src="{{url_for('static', filename = 'js/bootstrap.min.js')}}"></script>
