@@ -9,8 +9,6 @@
 
 5 - sudo docker-compose up
 
-![Image of speedtest_graph]
-(https://github.com/rk280392/speedtest-docker/blob/master/speedtest-graph.png)
+![Image of speedtest_graph](speedtest-graph.png)
 
-![Image of speedtest_report]
-https://github.com/rk280392/speedtest-docker/blob/master/speedtest-graph.png
+![Image of speedtest_report](speedtest-graph.png)
