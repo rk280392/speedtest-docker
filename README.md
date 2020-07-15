@@ -11,4 +11,4 @@
 
 ![Image of speedtest_graph](speedtest-graph.png)
 
-![Image of speedtest_report](speedtest-graph.png)
+![Image of speedtest_report](speedtest-report.png)
